@@ -2,30 +2,51 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+<div class="jumbotron-fluid">
+    <h1>Function Generator</h1>
+    <p class="lead">We generating your code! just tell us what we can coding for you...</p>
+
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+<p><a class="btn btn-outline-secondary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301865">Load Description ↑</a></p>
+<div class="jumbotron">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Your description</span>
+        </div>
+        <textarea id="textInput" class="form-control" rows="7" aria-label="Your description" style="min-width: 85%"></textarea>
     </div>
 </div>
+
+<p><a id="updateCodeButton" class="btn btn-success btn-lg">GENERATE &rsaquo;</a></p>
+
+<div class="jumbotron">
+    <div class="bg-transparent">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Generated code</span>
+            </div>
+            @*<textarea value ="@ViewBag.GeneratedCode" id="GeneratedCode" class="form-control" rows="7" aria-label="Generated code" style="min-width: 85%"></textarea>*@
+            <div id="code" class="flex-container">@Html.Raw(ViewBag.GeneratedCode)</div>
+        </div>
+    </div>
+</div>
+
+<p><a class="btn btn-outline-secondary btn-sm" OnClick="btnHighLight_Click">Export file ↓</a></p>
+
+<script>
+    $().ready(() => {
+
+        $('#updateCodeButton').click(() => {
+            updateCode();
+        })
+
+
+    var updateCode = function () {
+        var text = $('#textInput').val();
+        $.post('/Home/UpdateText', { text: text}).done(data => {
+            this.document.getElementById('code').innerHTML = data;
+        });
+        };
+    });
+</script>
