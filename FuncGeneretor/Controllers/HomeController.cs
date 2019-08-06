@@ -26,14 +26,6 @@ namespace FuncGeneretor.Controllers
                 "js", _rg)
                 );
 
-            // Display the highlighted code in a label control.
-            //Request.Form["GeneratedCode"] = CodeManager.Encode(
-            //CodeManager.HighlightHTMLCode(InputText, _htb)
-            //);
-            //ViewBag.GeneratedCode = CodeManager.Encode(
-            //CodeManager.HighlightHTMLCode(InputText, _htb)
-            //);
-
             return View();
         }
 
@@ -54,9 +46,12 @@ namespace FuncGeneretor.Controllers
         [HttpPost]
         public ActionResult UpdateText(string text)
         {
-            text += "\n";
-            string InputText = text + "var x = 10;\nx *= 5;\ndocument.getElementById(\"demo\").innerHTML = x;\nif( x == 8 ){\n}\nelse{\nwhile(true)//111test comment\n}\n//with new comment";
-            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+            CodeBuilder codebuilder = new CodeBuilder();
+            string InputText = codebuilder.PrintRandomFunction();
+            InputText = CodeManager.Beautiffy(InputText);
+           ////text += "\n";
+           ////string InputText = text + "var x = 10;\nx *= 5;\ndocument.getElementById(\"demo\").innerHTML = x;\nif( x == 8 ){\n}\nelse{\nwhile(true)//111test comment\n}\n//with new comment";
+           Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
 
             // Initialize the suitable collection object.
             RegExp _rg = new RegExp();
@@ -69,30 +64,31 @@ namespace FuncGeneretor.Controllers
                 "js", _rg)
                 );
 
-            // Display the highlighted code in a label control.
-            //Request.Form["GeneratedCode"] = CodeManager.Encode(
-            //CodeManager.HighlightHTMLCode(InputText, _htb)
-            //);
-            //ViewBag.GeneratedCode = CodeManager.Encode(
-            //CodeManager.HighlightHTMLCode(InputText, _htb)
-            //);
+            InputText = result;
+           //// Display the highlighted code in a label control.
+           //Request.Form["GeneratedCode"] = CodeManager.Encode(
+           //CodeManager.HighlightHTMLCode(InputText, _htb)
+           //);
+           //ViewBag.GeneratedCode = CodeManager.Encode(
+           //CodeManager.HighlightHTMLCode(InputText, _htb)
+           //);
 
-            return new JsonResult() { Data = result };
+            return new JsonResult() { Data = InputText };
         }
 
         protected void btnHighLight_Click(object sender, EventArgs e)
         {
-            string InputText = String.Format("{0}", Request.Form["GeneratedCode"]);
-            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+            //string InputText = String.Format("{0}", Request.Form["GeneratedCode"]);
+            //Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
 
-            // Initialize the suitable collection object.
-            RegExp _rg = new RegExp();
-            _rg = (RegExp)_htb["js"];
+            //// Initialize the suitable collection object.
+            //RegExp _rg = new RegExp();
+            //_rg = (RegExp)_htb["js"];
 
-            // Display the highlighted code in a label control.
-            Request.Form["GeneratedCode"] = CodeManager.Encode(
-                CodeManager.HighlightHTMLCode(InputText, _htb)
-                );
+            //// Display the highlighted code in a label control.
+            //Request.Form["GeneratedCode"] = CodeManager.Encode(
+            //    CodeManager.HighlightHTMLCode(InputText, _htb)
+            //    );
 
         }
     }

@@ -7,30 +7,62 @@ namespace FuncGeneretor
 {
     public class CodeNode
     {
-       public string Code { get; set; }
-       public string CodeEnd { get; set; }
+       public string CodeStart { get; set; }
+       public List<CodeNode> CodeNodesInside1 { get; set; }
+       public string CodeEnd1 { get; set; }
+       public List<CodeNode> CodeNodesInside2 { get; set; }
+       public string CodeEnd2 { get; set; }
+       public List<CodeNode> CodeNodesAfter { get; set; }
+       public bool isHaveThenAfter { get; set; }
        public List<string> descriptions { get; set; }
-       public List<CodeNode> CodeNodes { get; set; }
-       public List<CodeNode> CodeNodesInside { get; set; }
-        public string CodeEndInside { get; set; }
-        public bool isHaveThenAfter { get; set; }
+       protected Random ins1Rand;
+       protected Random ins2Rand ;
+       protected Random AfterRand;
 
-
-        public CodeNode(string code)
+        public CodeNode()
         {
             descriptions = new List<string>();
-            CodeNodes = new List<CodeNode>();
-            Code = code;
+            CodeNodesInside1 = new List<CodeNode>();
+            CodeNodesInside2 = new List<CodeNode>();
+            CodeNodesAfter = new List<CodeNode>();
+            ins1Rand = new Random();
+            ins2Rand = new Random();
+            AfterRand = new Random();
         }
 
-        public void AddCodeNode(CodeNode codeNode)
+        public virtual string getFuncStringRand(int levels, CodeNode vars)
         {
-            this.CodeNodes.Add(codeNode);
-        }
 
-        public void AddDescription(string description)
-        {
-            this.descriptions.Add(description);
+            int ran1;
+            int ran2;
+            int ran3;
+            string inside1Gen = "";
+            string inside2Gen = "";
+            string AfterGen = "";
+
+            if  (this.CodeNodesInside1.Any())
+            {
+                ran1 = ins1Rand.Next(0, this.CodeNodesInside1.Count);
+                inside1Gen = this.CodeNodesInside1[ran1].getFuncStringRand(levels, vars);
+            }
+
+            if (this.CodeNodesInside2.Any()) 
+            {
+                ran2 = ins2Rand.Next(0, this.CodeNodesInside2.Count);
+                inside2Gen = this.CodeNodesInside2[ran2].getFuncStringRand(levels, vars);
+            }
+
+            if (this.CodeNodesAfter.Any())
+            {
+                if (levels > 0)
+                {
+                    levels--;
+                    ran3 = AfterRand.Next(0, this.CodeNodesAfter.Count);
+                    AfterGen = this.CodeNodesAfter[ran3].getFuncStringRand(levels, vars);
+                }
+            }
+
+            return CodeStart + inside1Gen + this.CodeEnd1 + inside2Gen + this.CodeEnd2 + AfterGen;
         }
     }
 }

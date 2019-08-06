@@ -147,6 +147,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="CodeBuilder.cs" />
     <Compile Include="CodeNode.cs" />
+    <Compile Include="CreateVarNode.cs" />
     <Compile Include="CSASPNETHighlightCodeInPage.aspx.designer.cs" />
     <Compile Include="CodeManager.cs" />
     <Compile Include="Controllers\HomeController.cs" />

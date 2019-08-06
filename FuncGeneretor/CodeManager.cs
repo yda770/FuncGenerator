@@ -766,7 +766,7 @@ namespace CSASPNETHighlightCodeInPage
                             {
                                 for (int j = 0; j < diffCurlyBrackets; j++)
                                 {
-                                    result += "\t";
+                                    result += "    ";
                                 }
                             }
 
@@ -798,30 +798,43 @@ namespace CSASPNETHighlightCodeInPage
                                 result += "\n";
                                 for (int j = 0; j < diffCurlyBrackets; j++)
                                 {
-                                    result += "\t";
+                                    result += "    ";
                                 }
                             }
 
                             break;
                         }
-                    //case ("{"):
-                    //    {
-                    //        if (!isText)
-                    //        {
-                    //            result += "\n";
-                    //        }
+                    case ("{"):
+                        {
+                            if (!isText)
+                            {
+                                diffCurlyBrackets++;
+                                result += "\n";
+                                for (int j = 0; j < diffCurlyBrackets; j++)
+                                {
+                                    result += "    ";
+                                }
+                            }
 
-                    //        break;
-                    //    }
-                    //case ("{"):
-                    //    {
-                    //        if (!isText && diffRoundBrackets == 0)
-                    //        {
-                    //            result += "\n";
-                    //        }
+                            break;
+                        }
+                    case ("}"):
+                        {
+                            if (!isText)
+                            {
+                                result = result.Remove(result.Length - 5, 4);
+                                diffCurlyBrackets--;
+                                result += "\n";
+                                for (int j = 0; j < diffCurlyBrackets; j++)
+                                {
+                                    result += "    ";
+                                }
 
-                    //        break;
-                    //    }
+                                
+                            }
+
+                            break;
+                        }
 
                 }
             }
