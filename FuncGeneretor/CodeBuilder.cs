@@ -186,7 +186,7 @@ namespace FuncGeneretor
 
             this.Number.CodeNodesInside1.Add(Number1);
             this.Number.CodeNodesInside1.Add(Number2);
-            this.Number.CodeNodesInside1.Add(Number3);
+            this.Number.CodeNodesInside1.Add(Number3); 
             this.Number.CodeNodesInside1.Add(Number4);
             this.Number.CodeNodesInside1.Add(Number5);
             this.Number.CodeNodesInside1.Add(Number6);
