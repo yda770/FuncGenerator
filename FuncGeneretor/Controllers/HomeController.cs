@@ -49,7 +49,7 @@ namespace FuncGeneretor.Controllers
             CodeBuilder codebuilder = new CodeBuilder();
             FuncCodeAndDesc InputText = codebuilder.PrintRandomFunction(commandNum - 1, conditionNum);
             InputText.FuncCode = CodeManager.Beautiffy(InputText.FuncCode);
-            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init(); 
 
             // Initialize the suitable collection object.
             RegExp _rg = new RegExp();
