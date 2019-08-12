@@ -1,8 +1,62 @@
 ﻿@{
     ViewBag.Title = "Experiment Actions";
 }
-@*<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>*@
 
 
-@*<p>Use this area to provide additional information.</p>*@
+<div class="jumbotron">
+    <form class="form-inline">
+        <p><a id="updateCodeButton" class="btn btn-outline-success btn-md">Random Function Example</a></p>
+        <div class="input-group input-group-md mb-3 col-md-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-md">Commans in section</span>
+            </div>
+            <input id="comnum" type="number" min="1" value="3" class="form-control" aria-label="Commans in section" aria-describedby="inputGroup-sizing-sm">
+        </div>
+
+        <div class="input-group input-group-md mb-3 col-md-4">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-md">Condition Complication</span>
+            </div>
+            <input id="condnum" type="number" min="1" value="2" class="form-control" aria-label="Condition Complication" aria-describedby="inputGroup-sizing-sm">
+        </div>
+    </form>
+
+    <div class="bg-transparent">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Function Desc</span>
+            </div>
+            <div id="desc" class="flex-container">@Html.Raw(ViewBag.GeneratedDesc)</div>
+        </div>
+    </div>
+
+    <br>
+    <div class="bg-transparent">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Function Code</span>
+            </div>
+            @*<textarea value ="@ViewBag.GeneratedCode" id="GeneratedCode" class="form-control" rows="7" aria-label="Generated code" style="min-width: 85%"></textarea>*@
+            <div id="code" class="flex-container">@Html.Raw(ViewBag.GeneratedCode)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $().ready(() => {
+
+        $('#updateCodeButton').click(() => {
+            updateCode();
+        })
+
+
+        var updateCode = function () {
+            var comandnum = $('#comnum').val();
+            var condnum = $('#condnum').val();
+            $.post('/Home/UpdateText', { commandNum: comandnum, conditionNum: condnum }).done(data => {
+                this.document.getElementById('code').innerHTML = data.FuncCode;
+                this.document.getElementById('desc').innerHTML = data.FuncDesc;
+            });
+        };
+    });
+</script>

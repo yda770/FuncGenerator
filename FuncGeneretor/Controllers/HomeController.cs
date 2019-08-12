@@ -44,14 +44,12 @@ namespace FuncGeneretor.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateText(string text)
+        public ActionResult UpdateText(int commandNum, int conditionNum)
         {
             CodeBuilder codebuilder = new CodeBuilder();
-            string InputText = codebuilder.PrintRandomFunction();
-            InputText = CodeManager.Beautiffy(InputText);
-           ////text += "\n";
-           ////string InputText = text + "var x = 10;\nx *= 5;\ndocument.getElementById(\"demo\").innerHTML = x;\nif( x == 8 ){\n}\nelse{\nwhile(true)//111test comment\n}\n//with new comment";
-           Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+            FuncCodeAndDesc InputText = codebuilder.PrintRandomFunction(commandNum - 1, conditionNum);
+            InputText.FuncCode = CodeManager.Beautiffy(InputText.FuncCode);
+            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
 
             // Initialize the suitable collection object.
             RegExp _rg = new RegExp();
@@ -60,11 +58,11 @@ namespace FuncGeneretor.Controllers
             // Display the highlighted code in a label control.
             var result = CodeManager.Encode(
                 CodeManager.HighlightCode(
-                InputText.Replace("&quot;", "\""),
+                InputText.FuncCode.Replace("&quot;", "\""),
                 "js", _rg)
                 );
 
-            InputText = result;
+            InputText.FuncCode = result;
            //// Display the highlighted code in a label control.
            //Request.Form["GeneratedCode"] = CodeManager.Encode(
            //CodeManager.HighlightHTMLCode(InputText, _htb)

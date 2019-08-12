@@ -145,13 +145,14 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="CodeBuilder.cs" />
-    <Compile Include="CodeNode.cs" />
-    <Compile Include="CreateVarNode.cs" />
+    <Compile Include="class\CodeBuilder.cs" />
+    <Compile Include="class\CodeNode.cs" />
+    <Compile Include="class\CreateVarNode.cs" />
+    <Compile Include="class\ForInsideNode.cs" />
     <Compile Include="CSASPNETHighlightCodeInPage.aspx.designer.cs" />
-    <Compile Include="CodeManager.cs" />
+    <Compile Include="class\CodeManager.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="FuncCodeAndDesc.cs" />
+    <Compile Include="class\FuncCodeAndDesc.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
