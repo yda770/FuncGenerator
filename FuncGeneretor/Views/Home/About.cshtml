@@ -2,42 +2,54 @@
     ViewBag.Title = "Experiment Actions";
 }
 
-
 <div class="jumbotron">
+
     <form class="form-inline">
-        <p><a id="updateCodeButton" class="btn btn-outline-success btn-md">Random Function Example</a></p>
-        <div class="input-group input-group-md mb-3 col-md-4">
+        <div class="input-group input-group-md md-2 col-md-4">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-md">Commans in section</span>
             </div>
-            <input id="comnum" type="number" min="1" value="3" class="form-control" aria-label="Commans in section" aria-describedby="inputGroup-sizing-sm">
+            <input id="comnum" type="number" min="1" value="3" class="form-control" aria-label="Commans in section" aria-describedby="inputGroup-sizing-md">
         </div>
 
-        <div class="input-group input-group-md mb-3 col-md-4">
+        <div class="input-group input-group-md md-2 col-md-4">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-md">Condition Complication</span>
             </div>
-            <input id="condnum" type="number" min="1" value="2" class="form-control" aria-label="Condition Complication" aria-describedby="inputGroup-sizing-sm">
+            <input id="condnum" type="number" min="2" value="2" class="form-control" aria-label="Condition Complication" aria-describedby="inputGroup-sizing-md">
         </div>
-    </form>
+        <p><a id="updateCodeButton" class="btn btn-outline-success btn-md">Random Function Example</a></p>
 
+    </form>
+    <br>
+
+    <div class="alert alert-info" role="alert">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary"  id="FileButton" type="button">Download Dataset</button>
+            </div>
+            <input type="number" id="dataCount"  min="1" value="1000" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+        </div>
+        File will be in directory: C:\Users\yehuda_da\Desktop\פרוייקט גמר
+    </div>
     <div class="bg-transparent">
         <div class="input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text">Function Desc</span>
             </div>
-            <div id="desc" class="flex-container">@Html.Raw(ViewBag.GeneratedDesc)</div>
-        </div>
-    </div>
-
-    <br>
-    <div class="bg-transparent">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Function Code</span>
+            <div class="flex-container">
+                <span id="desc" class="str">@Html.Raw(ViewBag.GeneratedDesc)</span>
             </div>
-            @*<textarea value ="@ViewBag.GeneratedCode" id="GeneratedCode" class="form-control" rows="7" aria-label="Generated code" style="min-width: 85%"></textarea>*@
-            <div id="code" class="flex-container">@Html.Raw(ViewBag.GeneratedCode)</div>
+        </div>
+
+        <br>
+        <div class="bg-transparent">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Function Code</span>
+                </div>
+                <div id="code" class="flex-container">@Html.Raw(ViewBag.GeneratedCode)</div>
+            </div>
         </div>
     </div>
 </div>
@@ -49,13 +61,29 @@
             updateCode();
         })
 
+        $('#FileButton').click(() => {
+            DownloadData();
+        })
 
         var updateCode = function () {
             var comandnum = $('#comnum').val();
             var condnum = $('#condnum').val();
             $.post('/Home/UpdateText', { commandNum: comandnum, conditionNum: condnum }).done(data => {
                 this.document.getElementById('code').innerHTML = data.FuncCode;
-                this.document.getElementById('desc').innerHTML = data.FuncDesc;
+                this.document.getElementById('desc').innerHTML = "/*" + data.FuncDesc + "*/";
+            });
+        };
+
+        function toggleAlert() {
+            alert("The paragraph was clicked.");
+        }
+        var DownloadData = function () {
+            var comandnum = $('#comnum').val();
+            var condnum = $('#condnum').val();
+            var dataCount = $('#dataCount').val();
+            alert("Download file started...");
+            $.post('/Home/DownloadFile', { commandNum: comandnum, conditionNum: condnum, dataCount: dataCount }).done(data => {
+               
             });
         };
     });

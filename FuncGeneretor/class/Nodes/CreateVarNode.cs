@@ -18,6 +18,7 @@ namespace FuncGeneretor
             FuncCodeAndDesc MyGenCode = new FuncCodeAndDesc();
 
             inside1Gen.FuncCode = "myVar" + this.NextVarNum;
+            inside1Gen.FuncDesc = "myVar" + this.NextVarNum;
             CodeNode NewVar = new CodeNode();
             NewVar.CodeStart = inside1Gen.FuncCode ;
             NewVar.descriptions.Add(inside1Gen.FuncCode);
@@ -29,7 +30,7 @@ namespace FuncGeneretor
                 if (levels > 0)
                 {
                     levels--;
-                    ran3 = AfterRand.Next(0, this.CodeNodesAfter.Count);
+                    ran3 = random.Next(0, this.CodeNodesAfter.Count);
                     AfterGen = this.CodeNodesAfter[ran3].getFuncStringRand(levels,condLevel, vars);
                 }
             }
@@ -37,6 +38,21 @@ namespace FuncGeneretor
             MyGenCode.FuncCode = this.CodeStart + inside1Gen.FuncCode + this.CodeEnd1 + inside2Gen.FuncCode + this.CodeEnd2 + AfterGen.FuncCode;
             MyGenCode.FuncDesc = this.GetFuncDesc(inside1Gen.FuncDesc, inside2Gen.FuncDesc, AfterGen.FuncDesc);
             return MyGenCode;
+        }
+
+        public override string GetFuncDesc(string inside1, string inside2, string after)
+        {
+            int rand;
+            string myDesc = "";
+            if (this.descriptions.Any())
+            {
+                rand = random.Next(0, this.descriptions.Count);
+                myDesc = this.descriptions[rand];
+            }
+
+            myDesc = myDesc.Replace("<var>", inside1);
+
+            return myDesc + after;
         }
     }
 }

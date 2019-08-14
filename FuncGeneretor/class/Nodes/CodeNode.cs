@@ -21,10 +21,7 @@ namespace FuncGeneretor
        public List<CodeNode> CodeNodesAfter { get; set; }
        public bool isHaveThenAfter { get; set; }
        
-       protected Random ins1Rand;
-       protected Random ins2Rand ;
-       protected Random AfterRand;
-       protected Random DescRand;
+       protected static Random random = new Random();
 
         public CodeNode()
         {
@@ -32,15 +29,10 @@ namespace FuncGeneretor
             this.CodeNodesInside1 = new List<CodeNode>();
             this.CodeNodesInside2 = new List<CodeNode>();
             this.CodeNodesAfter = new List<CodeNode>();
-            this.ins1Rand  = new Random();
-            this.ins2Rand  = new Random();
-            this.AfterRand = new Random();
-            this.DescRand = new Random();
         }
 
         public virtual FuncCodeAndDesc getFuncStringRand(int levels, int condLevel, CodeNode vars)
         {
-
             int ran1;
             int ran2;
             int ran3;
@@ -51,13 +43,13 @@ namespace FuncGeneretor
 
             if  (this.CodeNodesInside1.Any())
             {
-                ran1 = ins1Rand.Next(0, this.CodeNodesInside1.Count);
+                ran1 = random.Next(0, this.CodeNodesInside1.Count);
                 inside1Gen = this.CodeNodesInside1[ran1].getFuncStringRand(levels, condLevel, vars);
             }
 
             if (this.CodeNodesInside2.Any()) 
             {
-                ran2 = ins2Rand.Next(0, this.CodeNodesInside2.Count);
+                ran2 = random.Next(0, this.CodeNodesInside2.Count);
                 inside2Gen = this.CodeNodesInside2[ran2].getFuncStringRand(levels, condLevel, vars);
             }
 
@@ -66,7 +58,7 @@ namespace FuncGeneretor
                 if (levels > 0)
                 {
                     levels--;
-                    ran3 = AfterRand.Next(0, this.CodeNodesAfter.Count);
+                    ran3 = random.Next(0, this.CodeNodesAfter.Count);
                     AfterGen = this.CodeNodesAfter[ran3].getFuncStringRand(levels, condLevel, vars);
                 }
             }
@@ -83,7 +75,7 @@ namespace FuncGeneretor
             if (this.descriptions.Any())
             {
 
-                rand = this.DescRand.Next(0, this.descriptions.Count);
+                rand = random.Next(0, this.descriptions.Count);
                 myDesc = this.descriptions[rand];
             }
             

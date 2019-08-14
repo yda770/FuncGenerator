@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace FuncGeneretor
@@ -33,19 +34,19 @@ namespace FuncGeneretor
         {
             
             this.GraphHead       = new CodeNode();
-            this.ReturnNode      = new CodeNode();
+            this.ReturnNode      = new ReturnNode();
             this.ArithmeticNode  = new CodeNode();
             this.OperandsNode    = new CodeNode();
-            this.ConditionNode   = new CodeNode();
-            this.ForNode         = new CodeNode();
-            this.WhileNode       = new CodeNode();
-            this.PlacementNode   = new CodeNode();
+            this.ConditionNode   = new IfNode();
+            this.ForNode         = new ForNode();
+            this.WhileNode       = new WhileNode();
+            this.PlacementNode   = new PlacementNode();
             this.Number          = new CodeNode();
             this.Boolean         = new CodeNode();
             this.Variable        = new CodeNode();
             this.NextNewVar      = new CodeNode();
             this.CreateVar       = new CreateVarNode();
-            this.ArithmeticUnary = new CodeNode();
+            this.ArithmeticUnary = new UnaryNode();
 
             GraphHead.CodeStart = "function func(var A, var B){";
 
@@ -86,10 +87,10 @@ namespace FuncGeneretor
             this.WhileNode.CodeStart = "while (";
             this.WhileNode.CodeEnd1 = "){";
             this.WhileNode.CodeEnd2 = "}";
-            this.WhileNode.descriptions.Add("Perform loop as long as <cond> is fulfilled and do <inside>");
-            this.WhileNode.descriptions.Add("Keep loop going while <conf> exists and perform <inside>");
-            this.WhileNode.descriptions.Add("While <cond> is true do in loop <inside>");
-            this.WhileNode.descriptions.Add("While <cond> do <inside>");
+            this.WhileNode.descriptions.Add("Perform loop as long as <cond> is fulfilled and do: <inside>");
+            this.WhileNode.descriptions.Add("Keep loop going while <cond> exists and perform: <inside>");
+            this.WhileNode.descriptions.Add("While <cond> is true do in loop: <inside>");
+            this.WhileNode.descriptions.Add("While <cond> do: <inside>");
 
             // After 
             this.WhileNode.CodeNodesAfter.Add(this.ReturnNode);
@@ -116,19 +117,16 @@ namespace FuncGeneretor
         private void BuildForNode()
         {
             CodeNode ForArithNode = new CodeNode();
-            CodeNode ForPlacment = new CodeNode();
-            CodeNode ForArirhUnary = new CodeNode();
+            CodeNode ForPlacment = new PlacementNode();
+            CodeNode ForArirhUnary = new UnaryNode();
 
 
             ForArithNode.CodeNodesInside1 = this.ArithmeticNode.CodeNodesInside1;
 
             ForPlacment.CodeEnd1 = " = ";
-            ForPlacment.CodeNodesInside1.Add(this.Variable);
-            ForPlacment.CodeNodesInside2.Add(this.Variable);
-            ForPlacment.CodeNodesInside2.Add(this.Number);
-            ForPlacment.CodeNodesInside2.Add(this.Boolean);
-            ForPlacment.CodeNodesInside2.Add(this.OperandsNode);
-            ForPlacment.CodeNodesInside2.Add(this.ArithmeticNode);
+            ForPlacment.CodeNodesInside1 = this.PlacementNode.CodeNodesInside1;
+            ForPlacment.CodeNodesInside2 = this.PlacementNode.CodeNodesInside2;
+            ForPlacment.descriptions = this.PlacementNode.descriptions;
 
             CodeNode UnaryPlus = new CodeNode();
             UnaryPlus.CodeStart = "++";
@@ -162,9 +160,9 @@ namespace FuncGeneretor
             this.ForNode.CodeNodesInside1.Add(ForInside);
             this.ForNode.CodeEnd1 = "){";
             this.ForNode.CodeEnd2 = "}";
-            this.ForNode.descriptions.Add("Run the for loop and <palcement>, as long as the condition <condition> exists and when done, do <arithmetic>.");
-            this.ForNode.descriptions.Add("Use the for loop and <palcement>, if the condition <condition> persists. Then go on to <arithmetic>.");
-            this.ForNode.descriptions.Add("Run the for loop with <palcement> in use, if the condition <condition> is relevant. At the end of every iteration do <arithmetic>.");
+            this.ForNode.descriptions.Add("Run the for loop and <palcement>, as long as the condition: <condition> exists and when done, do <arithmetic>:");
+            this.ForNode.descriptions.Add("Use the for loop and <palcement>, if the condition: <condition> persists. Then go on to <arithmetic>:");
+            this.ForNode.descriptions.Add("Run the for loop with <palcement> in use, if the condition: <condition> is relevant. At the end of every iteration do <arithmetic>:");
 
 
             // Inside 2
@@ -200,8 +198,8 @@ namespace FuncGeneretor
             this.CreateVar.CodeNodesAfter.Add(this.PlacementNode);
             this.CreateVar.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.CreateVar.CodeNodesAfter.Add(this.CreateVar);
-            this.CreateVar.descriptions.Add("Declare variable <var>");
-            this.CreateVar.descriptions.Add("Variable <var> declaration");
+            this.CreateVar.descriptions.Add("Declare variable <var>.");
+            this.CreateVar.descriptions.Add("Variable <var> declaration.");
             
 
 
@@ -217,10 +215,10 @@ namespace FuncGeneretor
             this.PlacementNode.CodeNodesInside2.Add(this.OperandsNode);
             this.PlacementNode.CodeNodesInside2.Add(this.ArithmeticNode);
             this.PlacementNode.CodeEnd2 = ";";
-            this.PlacementNode.descriptions.Add("Let variable <var> contain <expr>.");
-            this.PlacementNode.descriptions.Add("Place <expr> in variable <var>.");
-            this.PlacementNode.descriptions.Add("Set variable <var> to <expr>.");
-            this.PlacementNode.descriptions.Add("Let variable <var> be <expr>.");
+            this.PlacementNode.descriptions.Add("Let variable <var> contain: <expr>.");
+            this.PlacementNode.descriptions.Add("Place: <expr> in variable <var>.");
+            this.PlacementNode.descriptions.Add("Set variable <var> to: <expr>.");
+            this.PlacementNode.descriptions.Add("Let variable <var> be: <expr>.");
             this.PlacementNode.descriptions.Add("<var> = <expr>.");
 
             // After 
@@ -323,92 +321,91 @@ namespace FuncGeneretor
             this.OperandsNode.isHaveThenAfter = true;
             this.OperandsNode.CodeEnd1 = ")";
 
-            CodeNode OrNode = new CodeNode();
+            CodeNode OrNode = new OperandsNode();
             OrNode.CodeEnd1 = " || ";
+            OrNode.CodeNodesInside1.Add(this.OperandsNode); // Should be the first
+            OrNode.CodeNodesInside2.Add(this.OperandsNode); // Should be the first
             OrNode.CodeNodesInside1.Add(this.Variable);
             OrNode.CodeNodesInside2.Add(this.Variable);
-            OrNode.CodeNodesInside1.Add(this.OperandsNode);
-            OrNode.CodeNodesInside2.Add(this.OperandsNode);
-            OrNode.descriptions.Add("<cond1> or <con2> ");
-            OrNode.descriptions.Add("One or both <con1>, <cond2>");
+            OrNode.descriptions.Add("<cond1> or <cond2>");
+            OrNode.descriptions.Add("One or both <cond1>, <cond2>");
             OrNode.descriptions.Add("Either or both conditions <cond1>, <cond2>");
 
-            CodeNode AndNode = new CodeNode();
+            CodeNode AndNode = new OperandsNode();
             AndNode.CodeEnd1 = " && ";
-            AndNode.CodeNodesInside1.Add(this.Variable);
-            AndNode.CodeNodesInside2.Add(this.Variable);
             AndNode.CodeNodesInside1.Add(this.OperandsNode);
             AndNode.CodeNodesInside2.Add(this.OperandsNode);
+            AndNode.CodeNodesInside1.Add(this.Variable);
+            AndNode.CodeNodesInside2.Add(this.Variable);
             AndNode.descriptions.Add("<cond1> and <cond2>");
             AndNode.descriptions.Add("Both <cond1>, <cond2>");
     
 
-            CodeNode EqualNode = new CodeNode();
+            CodeNode EqualNode = new OperandsNode();
             EqualNode.CodeEnd1 = " == ";
-            EqualNode.descriptions.Add("<arg1> is equivalent to <arg2>");
-            EqualNode.descriptions.Add("<arg1> = <arg2>");
-            EqualNode.descriptions.Add("<arg1> and <arg2> are equivalent.");
-            EqualNode.descriptions.Add("There is equivalency between <arg1> and <arg2>.");
-            EqualNode.descriptions.Add("<arg1> has equivalent worth to <arg2>.");
+            EqualNode.descriptions.Add("<cond1> is equivalent to <cond2>");
+            EqualNode.descriptions.Add("<cond1> = <cond2>");
+            EqualNode.descriptions.Add("<cond1> and <cond2> are equivalent");
+            EqualNode.descriptions.Add("There is equivalency between <cond1> and <cond2>");
+            EqualNode.descriptions.Add("<cond1> has equivalent worth to <cond2>");
 
-            EqualNode.CodeNodesInside1.Add(this.Variable);
-            EqualNode.CodeNodesInside2.Add(this.Variable);
-            EqualNode.CodeNodesInside1.Add(this.ArithmeticNode);
-            EqualNode.CodeNodesInside2.Add(this.ArithmeticNode);
             EqualNode.CodeNodesInside1.Add(this.OperandsNode);
             EqualNode.CodeNodesInside2.Add(this.OperandsNode);
+            EqualNode.CodeNodesInside1.Add(this.ArithmeticNode);
+            EqualNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            EqualNode.CodeNodesInside1.Add(this.Variable);
+            EqualNode.CodeNodesInside2.Add(this.Variable);
             EqualNode.CodeNodesInside2.Add(this.Boolean);
             EqualNode.CodeNodesInside2.Add(this.Number);
 
-            CodeNode NotEqualNode = new CodeNode();
+            CodeNode NotEqualNode = new OperandsNode();
             NotEqualNode.CodeEnd1 = " != ";
-            NotEqualNode.descriptions.Add("<arg1> is not equivalent to <arg2>.");
-            NotEqualNode.descriptions.Add("<arg1> and <arg2> are not equivalent.");
-            NotEqualNode.descriptions.Add("There is no equivalency between <arg1> and <arg2>.");
-            NotEqualNode.descriptions.Add("<arg1> has no equivalent worth to <arg2>.");
-            NotEqualNode.descriptions.Add("<arg1> does not have equivalent worth to <arg2>.");
-            NotEqualNode.descriptions.Add("<arg1> is not equal to <arg2>.");
-            NotEqualNode.descriptions.Add("<arg1> not like <arg2>.");
-           
-            NotEqualNode.CodeNodesInside1.Add(this.Variable);
-            NotEqualNode.CodeNodesInside2.Add(this.Variable);
-            NotEqualNode.CodeNodesInside1.Add(this.ArithmeticNode);
-            NotEqualNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            NotEqualNode.descriptions.Add("<cond1> is not equivalent to <cond2>");
+            NotEqualNode.descriptions.Add("<cond1> and <cond2> are not equivalent");
+            NotEqualNode.descriptions.Add("There is no equivalency between <cond1> and <cond2>");
+            NotEqualNode.descriptions.Add("<cond1> has no equivalent worth to <cond2>");
+            NotEqualNode.descriptions.Add("<cond1> does not have equivalent worth to <cond2>");
+            NotEqualNode.descriptions.Add("<cond1> is not equal to <cond2>");
+            NotEqualNode.descriptions.Add("<cond1> not like <cond2>");
+
             NotEqualNode.CodeNodesInside1.Add(this.OperandsNode);
             NotEqualNode.CodeNodesInside2.Add(this.OperandsNode);
+            NotEqualNode.CodeNodesInside1.Add(this.ArithmeticNode);
+            NotEqualNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            NotEqualNode.CodeNodesInside1.Add(this.Variable);
+            NotEqualNode.CodeNodesInside2.Add(this.Variable);
             NotEqualNode.CodeNodesInside2.Add(this.Boolean);
             NotEqualNode.CodeNodesInside2.Add(this.Number);
 
-            CodeNode GreatNode = new CodeNode();
+            CodeNode GreatNode = new OperandsNode();
             GreatNode.CodeEnd1 = " > ";
-            GreatNode.descriptions.Add("<arg1> is more than <arg2>.");
-            GreatNode.descriptions.Add("<arg1> is higher than <arg2>.");
-            GreatNode.descriptions.Add("<arg1> has more value than <arg2>.");
-            GreatNode.descriptions.Add("<arg1> is worth more than <arg2>.");
-            GreatNode.descriptions.Add("<arg1> is greater than <arg2>.");
+            GreatNode.descriptions.Add("<cond1> is more than <cond2>");
+            GreatNode.descriptions.Add("<cond1> is higher than <cond2>");
+            GreatNode.descriptions.Add("<cond1> has more value than <cond2>");
+            GreatNode.descriptions.Add("<cond1> is worth more than <cond2>");
+            GreatNode.descriptions.Add("<cond1> is greater than <cond2>");
 
-            GreatNode.CodeNodesInside1.Add(this.Variable);
-            GreatNode.CodeNodesInside2.Add(this.Variable);
             GreatNode.CodeNodesInside1.Add(this.OperandsNode);
             GreatNode.CodeNodesInside2.Add(this.OperandsNode);
             GreatNode.CodeNodesInside1.Add(this.ArithmeticNode);
             GreatNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            GreatNode.CodeNodesInside1.Add(this.Variable);
+            GreatNode.CodeNodesInside2.Add(this.Variable);
             GreatNode.CodeNodesInside2.Add(this.Number);
 
-            CodeNode LitleNode = new CodeNode();
+            CodeNode LitleNode = new OperandsNode();
             LitleNode.CodeEnd1 = " < ";
-            LitleNode.descriptions.Add("<arg1> is less than <arg2>.");
-            LitleNode.descriptions.Add("<arg1> is lower than <arg2>.");
-            LitleNode.descriptions.Add("<arg1> has less value than <arg2>");
-            LitleNode.descriptions.Add("<arg1> is worth less than <arg2>.");
-            LitleNode.descriptions.Add("<arg1> is worth less than <arg2>.");            
-
-            LitleNode.CodeNodesInside1.Add(this.Variable);
-            LitleNode.CodeNodesInside2.Add(this.Variable);
+            LitleNode.descriptions.Add("<cond1> is less than <cond2>");
+            LitleNode.descriptions.Add("<cond1> is lower than <cond2>");
+            LitleNode.descriptions.Add("<cond1> has less value than <cond2>");
+            LitleNode.descriptions.Add("<cond1> is worth less than <cond2>");
+            LitleNode.descriptions.Add("<cond1> is worth less than <cond2>");
             LitleNode.CodeNodesInside1.Add(this.OperandsNode);
             LitleNode.CodeNodesInside2.Add(this.OperandsNode);
             LitleNode.CodeNodesInside1.Add(this.ArithmeticNode);
             LitleNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            LitleNode.CodeNodesInside1.Add(this.Variable);
+            LitleNode.CodeNodesInside2.Add(this.Variable);
             LitleNode.CodeNodesInside2.Add(this.Number);
 
             this.OperandsNode.CodeNodesInside1.Add(OrNode);
@@ -455,20 +452,20 @@ namespace FuncGeneretor
             this.ArithmeticNode.isHaveThenAfter = true;
             this.ArithmeticNode.CodeEnd1 = ")";
 
-            CodeNode AddNode = new CodeNode();
+            CodeNode AddNode = new ArithNode();
             AddNode.CodeEnd1 = " + ";
             AddNode.descriptions.Add("<arg1> plus <arg2>");
             AddNode.descriptions.Add("<arg1> together with <arg2>");
             AddNode.descriptions.Add("<arg1> in addition to <arg2>");
             AddNode.descriptions.Add("<arg1> + <arg2>");
-            AddNode.CodeNodesInside1.Add(this.Number);
-            AddNode.CodeNodesInside2.Add(this.Number);
             AddNode.CodeNodesInside1.Add(this.ArithmeticNode);
             AddNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            AddNode.CodeNodesInside1.Add(this.Number);
+            AddNode.CodeNodesInside2.Add(this.Number);
             AddNode.CodeNodesInside1.Add(this.Variable);
             AddNode.CodeNodesInside2.Add(this.Variable);
 
-            CodeNode SubNode = new CodeNode();
+            CodeNode SubNode = new ArithNode();
             SubNode.CodeEnd1 = " - ";
             SubNode.descriptions.Add("<arg1> minus <arg2>");
             SubNode.descriptions.Add("<arg1> - <arg2>");
@@ -476,55 +473,51 @@ namespace FuncGeneretor
             SubNode.descriptions.Add("<arg2> subtracted from <arg1>");
             SubNode.descriptions.Add("Subtract <arg2> from variable <arg1>");
 
-            SubNode.CodeNodesInside1.Add(this.Number);
-            SubNode.CodeNodesInside2.Add(this.Number);
             SubNode.CodeNodesInside1.Add(this.ArithmeticNode);
             SubNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            SubNode.CodeNodesInside1.Add(this.Number);
+            SubNode.CodeNodesInside2.Add(this.Number);   
             SubNode.CodeNodesInside1.Add(this.Variable);
             SubNode.CodeNodesInside2.Add(this.Variable);
 
-
-
-
-            CodeNode DivNode = new CodeNode();
+            CodeNode DivNode = new ArithNode();
             DivNode.CodeEnd1 = " / ";
             DivNode.descriptions.Add("<arg1> divided by <arg2>");
             DivNode.descriptions.Add("<arg1> / <arg2>");
             DivNode.descriptions.Add("<arg1> \\ <arg2>");
             DivNode.descriptions.Add("<arg2> divided into <arg1>");
-            DivNode.CodeNodesInside1.Add(this.Number);
-            DivNode.CodeNodesInside2.Add(this.Number);
             DivNode.CodeNodesInside1.Add(this.ArithmeticNode);
             DivNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            DivNode.CodeNodesInside1.Add(this.Number);
+            DivNode.CodeNodesInside2.Add(this.Number);
             DivNode.CodeNodesInside1.Add(this.Variable);
             DivNode.CodeNodesInside2.Add(this.Variable);
-         
-
-            CodeNode MulNode = new CodeNode();
+  
+            CodeNode MulNode = new ArithNode();
             MulNode.CodeEnd1 = " * ";
             MulNode.descriptions.Add("<arg1> multiplied by <arg2>");
             MulNode.descriptions.Add("<arg1> times <arg2>");
             MulNode.descriptions.Add("<arg1> * <arg2>");
             MulNode.descriptions.Add("Multiply <arg1> by <arg2>");
             MulNode.descriptions.Add("Mul <arg1> by <arg2>");
-            
-            MulNode.CodeNodesInside1.Add(this.Number);
-            MulNode.CodeNodesInside2.Add(this.Number);
+
             MulNode.CodeNodesInside1.Add(this.ArithmeticNode);
             MulNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            MulNode.CodeNodesInside1.Add(this.Number);
+            MulNode.CodeNodesInside2.Add(this.Number);
             MulNode.CodeNodesInside1.Add(this.Variable);
             MulNode.CodeNodesInside2.Add(this.Variable);
 
-            CodeNode PowNode = new CodeNode();
+            CodeNode PowNode = new ArithNode();
             PowNode.CodeEnd1 = " ^ ";
             PowNode.descriptions.Add("<arg1> to the power of <arg2>");
             PowNode.descriptions.Add("<arg1> ^ <arg2>");
             PowNode.descriptions.Add("Multiply <arg1> by the power of <arg2>");
 
-            PowNode.CodeNodesInside1.Add(this.Number);
-            PowNode.CodeNodesInside2.Add(this.Number);
             PowNode.CodeNodesInside1.Add(this.ArithmeticNode);
             PowNode.CodeNodesInside2.Add(this.ArithmeticNode);
+            PowNode.CodeNodesInside1.Add(this.Number);
+            PowNode.CodeNodesInside2.Add(this.Number);
             PowNode.CodeNodesInside1.Add(this.Variable);
             PowNode.CodeNodesInside2.Add(this.Variable);
 
@@ -543,42 +536,42 @@ namespace FuncGeneretor
             this.ConditionNode.isHaveThenAfter = true;
             this.ConditionNode.CodeEnd1 = "){";
             this.ConditionNode.CodeEnd2 = "}";
-            this.ConditionNode.descriptions.Add(" Check if <cond> is in effect, then do <inside>");
-            this.ConditionNode.descriptions.Add("If <cond> is active, then implement <inside>");
-            this.ConditionNode.descriptions.Add("Do <inside> if <cond> is present.");
-            this.ConditionNode.descriptions.Add("In the case of <cond>, do <inside>");
-            this.ConditionNode.descriptions.Add("If <cond> is valid, do <inside>");
-        
+            this.ConditionNode.descriptions.Add(" Check if <cond> is in effect, then do: <inside>");
+            this.ConditionNode.descriptions.Add("If <cond> is active, then implement: <inside>");
+            this.ConditionNode.descriptions.Add("Do <inside> if <cond> is present");
+            this.ConditionNode.descriptions.Add("In the case of <cond>, do: <inside>");
+            this.ConditionNode.descriptions.Add("If <cond> is valid, do: <inside>");
 
-
-
-
-
-
-
-
-      CodeNode ElseIfNode = new CodeNode();
+            CodeNode ElseIfNode = new IfNode();
             ElseIfNode.CodeStart = "else if (";
             ElseIfNode.CodeEnd1 = "){";
             ElseIfNode.CodeEnd2 = "}";
-            ElseIfNode.descriptions.Add("However if <cond> exists, do <inside>");
-            ElseIfNode.descriptions.Add("But when <cond> prevails, then do <inside>");
-            ElseIfNode.descriptions.Add("For a dissimilar <cond>, implement <inside>");
-            ElseIfNode.descriptions.Add("Else if <cond>, implement <inside>");
-            ElseIfNode.descriptions.Add("Else if <cond>, Do <inside>");
+            ElseIfNode.descriptions.Add("However if <cond> exists, do: <inside>");
+            ElseIfNode.descriptions.Add("But when <cond> prevails, then do: <inside>");
+            ElseIfNode.descriptions.Add("For a dissimilar <cond>, implement: <inside>");
+            ElseIfNode.descriptions.Add("Else if <cond>, implement: <inside>");
+            ElseIfNode.descriptions.Add("Else if <cond>, Do: <inside>");
  
 
-           CodeNode ElseNode = new CodeNode();
+           CodeNode ElseNode = new ElseNode();
             ElseNode.CodeStart = "else{";
             ElseNode.CodeEnd1 = "}";
-            ElseNode.descriptions.Add("In any other case, do <inside>");
-            ElseNode.descriptions.Add("Else, carry out <inside>");
-            ElseNode.descriptions.Add("Or else, implement <inside>");
-            ElseNode.descriptions.Add("For a different case, then do <inside>");
+            ElseNode.descriptions.Add("In any other case, do: <inside>");
+            ElseNode.descriptions.Add("Else, carry out: <inside>");
+            ElseNode.descriptions.Add("Or else, implement: <inside>");
+            ElseNode.descriptions.Add("For a different case, then do: <inside>");
             ElseNode.descriptions.Add("Else, <inside>");
 
             // After 
            this.ConditionNode.CodeNodesAfter.Add(ElseNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseIfNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseIfNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseIfNode);
+           this.ConditionNode.CodeNodesAfter.Add(ElseIfNode);
            this.ConditionNode.CodeNodesAfter.Add(ElseIfNode);
            this.ConditionNode.CodeNodesAfter.Add(this.ReturnNode);
            this.ConditionNode.CodeNodesAfter.Add(this.ConditionNode);
@@ -594,14 +587,19 @@ namespace FuncGeneretor
             // Inside 2 
             this.ConditionNode.CodeNodesInside2.Add(this.ReturnNode);
             this.ConditionNode.CodeNodesInside2.Add(this.ConditionNode);
-            this.ConditionNode.CodeNodesInside2.Add(ForNode);
-            this.ConditionNode.CodeNodesInside2.Add(WhileNode);
+            this.ConditionNode.CodeNodesInside2.Add(this.ForNode);
+            this.ConditionNode.CodeNodesInside2.Add(this.WhileNode);
             this.ConditionNode.CodeNodesInside2.Add(this.PlacementNode);
             this.ConditionNode.CodeNodesInside2.Add(this.ArithmeticUnary);
             this.ConditionNode.CodeNodesInside2.Add(this.CreateVar);
 
             // After 
             ElseIfNode.CodeNodesAfter.Add(ElseIfNode);
+            // More Chance
+            ElseIfNode.CodeNodesAfter.Add(ElseNode);
+            ElseIfNode.CodeNodesAfter.Add(ElseNode);
+            ElseIfNode.CodeNodesAfter.Add(ElseNode);
+            ElseIfNode.CodeNodesAfter.Add(ElseNode);
             ElseIfNode.CodeNodesAfter.Add(ElseNode);
             ElseIfNode.CodeNodesAfter.Add(this.ReturnNode);
             ElseIfNode.CodeNodesAfter.Add(this.ConditionNode);
@@ -635,11 +633,11 @@ namespace FuncGeneretor
             // Inside 2 
             ElseNode.CodeNodesInside1.Add(this.ReturnNode);
             ElseNode.CodeNodesInside1.Add(this.ConditionNode);
-            ElseNode.CodeNodesInside2.Add(this.ForNode);
-            ElseNode.CodeNodesInside2.Add(this.WhileNode);
-            ElseNode.CodeNodesInside2.Add(this.PlacementNode);
-            ElseNode.CodeNodesInside2.Add(this.ArithmeticUnary);
-            ElseNode.CodeNodesInside2.Add(this.CreateVar);
+            ElseNode.CodeNodesInside1.Add(this.ForNode);
+            ElseNode.CodeNodesInside1.Add(this.WhileNode);
+            ElseNode.CodeNodesInside1.Add(this.PlacementNode);
+            ElseNode.CodeNodesInside1.Add(this.ArithmeticUnary);
+            ElseNode.CodeNodesInside1.Add(this.CreateVar);
         }
 
         public void BuildReturnNodes()
@@ -647,9 +645,9 @@ namespace FuncGeneretor
             ReturnNode.CodeStart = "return (";
             ReturnNode.isHaveThenAfter = false;
             ReturnNode.CodeEnd1 = ");";
-            ReturnNode.descriptions.Add("Return <ret>");
-            ReturnNode.descriptions.Add("Put back <ret>");
-            ReturnNode.descriptions.Add("Exit with <ret>");
+            ReturnNode.descriptions.Add("Return <ret>.");
+            ReturnNode.descriptions.Add("Put back <ret>.");
+            ReturnNode.descriptions.Add("Exit with <ret>.");
 
             this.ReturnNode.CodeNodesInside1.Add(this.Number);
             this.ReturnNode.CodeNodesInside1.Add(this.OperandsNode);
@@ -659,11 +657,17 @@ namespace FuncGeneretor
 
         }
 
-        public FuncCodeAndDesc PrintRandomFunction(int commandNum, int conditionNum )
+        public FuncCodeAndDesc PrintRandomFunction(int commandNum, int conditionNum)
         {
+            Regex trimmer = new Regex(@"\s\s+");
+
+            
             this.BuildCodeGraph();
             
-            return this.GraphHead.getFuncStringRand(commandNum, commandNum, this.Variable);
+            FuncCodeAndDesc result = this.GraphHead.getFuncStringRand(commandNum, commandNum, this.Variable);
+            result.FuncCode = trimmer.Replace(result.FuncCode, " ");
+            result.FuncDesc = trimmer.Replace(result.FuncDesc, " ");
+            return result;
             
         }
     }

@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -25,14 +27,14 @@ namespace FuncGeneretor.Controllers
                 InputText.Replace("&quot;", "\""),
                 "js", _rg)
                 );
-
             return View();
         }
 
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
-
+            ViewBag.GeneratedDesc = "/*...  ...*/";
+            ViewBag.GeneratedCode = "{...  ...}";
             return View();
         }
 
@@ -63,31 +65,28 @@ namespace FuncGeneretor.Controllers
                 );
 
             InputText.FuncCode = result;
-           //// Display the highlighted code in a label control.
-           //Request.Form["GeneratedCode"] = CodeManager.Encode(
-           //CodeManager.HighlightHTMLCode(InputText, _htb)
-           //);
-           //ViewBag.GeneratedCode = CodeManager.Encode(
-           //CodeManager.HighlightHTMLCode(InputText, _htb)
-           //);
 
             return new JsonResult() { Data = InputText };
         }
 
-        protected void btnHighLight_Click(object sender, EventArgs e)
-        {
-            //string InputText = String.Format("{0}", Request.Form["GeneratedCode"]);
-            //Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+        [HttpPost]
+        public ActionResult DownloadFile(int commandNum, int conditionNum, int dataCount)
+        {  
+            string[] lines;
+            List<string> linesList = new List<string>();
+            CodeBuilder codebuilder = new CodeBuilder();
+            for (int i = 0; i < dataCount; i++)
+            {
+                FuncCodeAndDesc InputText = codebuilder.PrintRandomFunction(commandNum - 1, conditionNum);
+                linesList.Add(InputText.FuncDesc + "\t" + InputText.FuncCode);
+                Thread.Sleep(5);
+            }
 
-            //// Initialize the suitable collection object.
-            //RegExp _rg = new RegExp();
-            //_rg = (RegExp)_htb["js"];
+            lines = linesList.ToArray();
 
-            //// Display the highlighted code in a label control.
-            //Request.Form["GeneratedCode"] = CodeManager.Encode(
-            //    CodeManager.HighlightHTMLCode(InputText, _htb)
-            //    );
-
+            System.IO.File.WriteAllLines(@"C:\Users\yehuda_da\Desktop\פרוייקט גמר\eng-js.txt", lines);
+     
+            return new JsonResult();
         }
     }
 }
