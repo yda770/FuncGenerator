@@ -5,11 +5,15 @@
 <div class="jumbotron-fluid">
     <h1>Function Generator</h1>
     <p class="lead">We generating your code! just tell us what we can coding for you...</p>
-
 </div>
 
-<p><a class="btn btn-outline-secondary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301865">Load Description ↑</a></p>
+@*<p><a class="btn btn-outline-secondary btn-sm" href="https://go.microsoft.com/fwlink/?LinkId=301865">Load Description ↑</a></p>*@
+
 <div class="jumbotron">
+    <div class="custom-file" style="width: 205px">
+        <input type="file" class="custom-file-input" id="customFile">
+        <label class="custom-file-label" for="customFile" >Description from file ↑</label>
+    </div>
     <div class="input-group">
         <div class="input-group-prepend">
             <span class="input-group-text">Your description</span>
@@ -18,8 +22,8 @@
     </div>
 </div>
 
-<p><a id="updateCodeButton" class="btn btn-success btn-lg">GENERATE &rsaquo;</a></p>
-
+<p><a id="updateCodeButton" class="btn btn-outline-success btn-lg">Run &rsaquo;</a></p>
+<br>
 <div class="jumbotron">
     <div class="bg-transparent">
         <div class="input-group">
@@ -44,7 +48,7 @@
 
     var updateCode = function () {
         var text = $('#textInput').val();
-        $.post('/Home/UpdateText', { text: text}).done(data => {
+        $.post('/Home/RunModel', { request: text}).done(data => {
             this.document.getElementById('code').innerHTML = data;
         });
         };

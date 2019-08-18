@@ -47,6 +47,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Google.Apis, Version=1.40.3.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.40.3\lib\net45\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth, Version=1.40.3.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.40.3\lib\net45\Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.40.3.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Auth.1.40.3\lib\net45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core, Version=1.40.3.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Core.1.40.3\lib\net45\Google.Apis.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Drive.v2, Version=1.40.3.1671, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Drive.v2.1.40.3.1671\lib\net45\Google.Apis.Drive.v2.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices, Version=1.40.3.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.1.40.3\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AI.DependencyCollector, Version=2.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.DependencyCollector.2.10.0\lib\net45\Microsoft.AI.DependencyCollector.dll</HintPath>
     </Reference>
@@ -150,6 +168,7 @@
     <Compile Include="class\Nodes\OperandsNode.cs" />
     <Compile Include="class\Nodes\ArithNode.cs" />
     <Compile Include="class\Nodes\IfNode.cs" />
+    <Compile Include="class\Nodes\PrintNode.cs" />
     <Compile Include="class\Nodes\ReturnNode.cs" />
     <Compile Include="class\Nodes\WhileNode.cs" />
     <Compile Include="class\Nodes\PlacementNode.cs" />
@@ -159,6 +178,7 @@
     <Compile Include="class\Nodes\CodeNode.cs" />
     <Compile Include="class\Nodes\CreateVarNode.cs" />
     <Compile Include="class\Nodes\ForInsideNode.cs" />
+    <Compile Include="Controllers\DriveServiceMe.cs" />
     <Compile Include="CSASPNETHighlightCodeInPage.aspx.designer.cs" />
     <Compile Include="class\CodeManager.cs" />
     <Compile Include="Controllers\HomeController.cs" />

@@ -12,6 +12,7 @@ namespace FuncGeneretor.Controllers
 {
     public class HomeController : Controller
     {
+        public DriveServiceMe ServDrive  { get; set; }
         public ActionResult Index()
         {
             string InputText = "var x = 10;\nx *= 5;\ndocument.getElementById(\"demo\").innerHTML = x;\nif( x == 8 ){\n}\nelse{\nwhile(true)//111test comment\n}";
@@ -27,6 +28,9 @@ namespace FuncGeneretor.Controllers
                 InputText.Replace("&quot;", "\""),
                 "js", _rg)
                 );
+
+            ServDrive = new DriveServiceMe();
+            ServDrive.authenticate();
             return View();
         }
 
@@ -51,7 +55,7 @@ namespace FuncGeneretor.Controllers
             CodeBuilder codebuilder = new CodeBuilder();
             FuncCodeAndDesc InputText = codebuilder.PrintRandomFunction(commandNum - 1, conditionNum);
             InputText.FuncCode = CodeManager.Beautiffy(InputText.FuncCode);
-            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init(); 
+            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
 
             // Initialize the suitable collection object.
             RegExp _rg = new RegExp();
@@ -79,7 +83,6 @@ namespace FuncGeneretor.Controllers
             {
                 FuncCodeAndDesc InputText = codebuilder.PrintRandomFunction(commandNum - 1, conditionNum);
                 linesList.Add(InputText.FuncDesc + "\t" + InputText.FuncCode);
-                Thread.Sleep(5);
             }
 
             lines = linesList.ToArray();
@@ -87,6 +90,39 @@ namespace FuncGeneretor.Controllers
             System.IO.File.WriteAllLines(@"C:\Users\yehuda_da\Desktop\פרוייקט גמר\eng-js.txt", lines);
      
             return new JsonResult();
+        }
+
+        [HttpPost]
+        public ActionResult RunModel(string request)
+        {
+            string InputText = "";
+
+            ServDrive = new DriveServiceMe();
+            ServDrive.authenticate();
+            ServDrive.createFile(request);
+
+            while (InputText == "")
+            {
+                InputText = ServDrive.ReadFile("response.txt");
+            }
+
+            ServDrive.DeleteFile("response.txt");
+
+            InputText = CodeManager.Beautiffy(InputText);
+            Hashtable _htb = CSASPNETHighlightCodeInPage.CodeManager.Init();
+
+            // Initialize the suitable collection object.
+            RegExp _rg = new RegExp();
+            _rg = (RegExp)_htb["js"];
+
+            // Display the highlighted code in a label control.
+            var result = CodeManager.Encode(
+                CodeManager.HighlightCode(
+                InputText.Replace("&quot;", "\""),
+                "js", _rg)
+                );
+            InputText = result;
+            return new JsonResult() { Data = InputText }; 
         }
     }
 }

@@ -24,7 +24,7 @@ namespace FuncGeneretor
         public CodeNode ArithmeticUnary { get; set; }
         public CodeNode NotCondNode { get; set; }    // TODO
         public CodeNode StringVariable { get; set; } // TODO
-        public CodeNode ScreenOut { get; set; }      // TODO
+        public CodeNode ScreenOut { get; set; }      
 
         public int VarNum { get; set; }
 
@@ -47,6 +47,8 @@ namespace FuncGeneretor
             this.NextNewVar      = new CodeNode();
             this.CreateVar       = new CreateVarNode();
             this.ArithmeticUnary = new UnaryNode();
+            this.ScreenOut       = new PrintNode();
+            this.StringVariable  = new CodeNode();
 
             GraphHead.CodeStart = "function func(var A, var B){";
 
@@ -66,13 +68,15 @@ namespace FuncGeneretor
 
             this.BuildConditionNodes();
             this.BuildReturnNodes();
+            this.BuildPrintNode();
             this.BuildArithmeticNode();
             this.BuildOperandsCode();
-            this.BuildNumberVars();
+            this.BuildVars();
             this.BuildPlacment();
             this.BuildCreateVar();
             this.BuildForNode();
             this.BuildWhileNode();
+           
 
             GraphHead.CodeNodesInside1.Add(this.ReturnNode);
             GraphHead.CodeNodesInside1.Add(this.ConditionNode);
@@ -80,6 +84,31 @@ namespace FuncGeneretor
             GraphHead.CodeNodesInside1.Add(this.WhileNode);
             GraphHead.CodeNodesInside1.Add(this.PlacementNode);
             GraphHead.CodeNodesInside1.Add(this.ArithmeticUnary);
+            GraphHead.CodeNodesInside1.Add(this.ScreenOut);
+            GraphHead.CodeNodesInside1.Add(this.CreateVar);
+        }
+
+        private void BuildPrintNode()
+        {
+            this.ScreenOut.CodeStart = "alert(";
+            this.ScreenOut.CodeEnd1 = ");";
+            this.ScreenOut.descriptions.Add("Print to screen <output>.");
+            this.ScreenOut.descriptions.Add("Display output <output>.");
+            this.ScreenOut.descriptions.Add("Output screen <output>.");
+            this.ScreenOut.descriptions.Add("Output to screen <output>.");
+
+            this.ScreenOut.CodeNodesInside1.Add(this.ArithmeticNode);
+            this.ScreenOut.CodeNodesInside1.Add(this.Number);
+            this.ScreenOut.CodeNodesInside1.Add(this.Variable);
+            this.ScreenOut.CodeNodesInside1.Add(this.StringVariable);
+
+            this.ScreenOut.CodeNodesAfter.Add(this.ReturnNode);
+            this.ScreenOut.CodeNodesAfter.Add(this.ConditionNode);
+            this.ScreenOut.CodeNodesAfter.Add(this.ForNode);
+            this.ScreenOut.CodeNodesAfter.Add(this.WhileNode);
+            this.ScreenOut.CodeNodesAfter.Add(this.PlacementNode);
+            this.ScreenOut.CodeNodesAfter.Add(this.ArithmeticUnary);
+            this.ScreenOut.CodeNodesAfter.Add(this.CreateVar);
         }
 
         private void BuildWhileNode()
@@ -92,6 +121,7 @@ namespace FuncGeneretor
             this.WhileNode.descriptions.Add("While <cond> is true do in loop: <inside>");
             this.WhileNode.descriptions.Add("While <cond> do: <inside>");
 
+
             // After 
             this.WhileNode.CodeNodesAfter.Add(this.ReturnNode);
             this.WhileNode.CodeNodesAfter.Add(this.ConditionNode);
@@ -100,6 +130,7 @@ namespace FuncGeneretor
             this.WhileNode.CodeNodesAfter.Add(this.PlacementNode);
             this.WhileNode.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.WhileNode.CodeNodesAfter.Add(this.CreateVar);
+            this.WhileNode.CodeNodesAfter.Add(this.ScreenOut);
 
             // Inside 1
             this.WhileNode.CodeNodesInside1.Add(this.OperandsNode);
@@ -112,6 +143,7 @@ namespace FuncGeneretor
             this.WhileNode.CodeNodesInside2.Add(this.PlacementNode);
             this.WhileNode.CodeNodesInside2.Add(this.ArithmeticUnary);
             this.WhileNode.CodeNodesInside2.Add(this.CreateVar);
+            this.WhileNode.CodeNodesInside2.Add(this.ScreenOut);
         }
 
         private void BuildForNode()
@@ -164,7 +196,6 @@ namespace FuncGeneretor
             this.ForNode.descriptions.Add("Use the for loop and <palcement>, if the condition: <condition> persists. Then go on to <arithmetic>:");
             this.ForNode.descriptions.Add("Run the for loop with <palcement> in use, if the condition: <condition> is relevant. At the end of every iteration do <arithmetic>:");
 
-
             // Inside 2
          this.ForNode.CodeNodesInside2.Add(this.ReturnNode);
             this.ForNode.CodeNodesInside2.Add(this.ConditionNode);
@@ -173,6 +204,7 @@ namespace FuncGeneretor
             this.ForNode.CodeNodesInside2.Add(this.PlacementNode);
             this.ForNode.CodeNodesInside2.Add(this.ArithmeticUnary);
             this.ForNode.CodeNodesInside2.Add(this.CreateVar);
+            this.ForNode.CodeNodesInside2.Add(this.ScreenOut);
 
             // After
             this.ForNode.CodeNodesAfter.Add(this.ReturnNode);
@@ -182,6 +214,7 @@ namespace FuncGeneretor
             this.ForNode.CodeNodesAfter.Add(this.PlacementNode);
             this.ForNode.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.ForNode.CodeNodesAfter.Add(this.CreateVar);
+            this.ForNode.CodeNodesAfter.Add(this.ScreenOut);
 
         }
 
@@ -198,11 +231,9 @@ namespace FuncGeneretor
             this.CreateVar.CodeNodesAfter.Add(this.PlacementNode);
             this.CreateVar.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.CreateVar.CodeNodesAfter.Add(this.CreateVar);
+            this.CreateVar.CodeNodesAfter.Add(this.ScreenOut);
             this.CreateVar.descriptions.Add("Declare variable <var>.");
             this.CreateVar.descriptions.Add("Variable <var> declaration.");
-            
-
-
         }
 
         private void BuildPlacment()
@@ -229,9 +260,10 @@ namespace FuncGeneretor
             this.PlacementNode.CodeNodesAfter.Add(this.PlacementNode);
             this.PlacementNode.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.PlacementNode.CodeNodesAfter.Add(this.CreateVar);
+            this.PlacementNode.CodeNodesAfter.Add(this.ScreenOut);
         }
 
-        private void BuildNumberVars()
+        private void BuildVars()
         {
             CodeNode Number1 = new CodeNode();
             Number1.CodeStart = "1";
@@ -313,6 +345,11 @@ namespace FuncGeneretor
 
             this.Variable.CodeNodesInside1.Add(A);
             this.Variable.CodeNodesInside1.Add(B);
+
+            CodeNode HelloWorld = new CodeNode();
+            HelloWorld.CodeStart = "\"Hello World\"";
+            HelloWorld.descriptions.Add("\"Hello World\"");
+            this.StringVariable.CodeNodesInside1.Add(HelloWorld);
         }
 
         private void BuildOperandsCode()
@@ -447,6 +484,7 @@ namespace FuncGeneretor
             this.ArithmeticUnary.CodeNodesAfter.Add(this.PlacementNode);
             this.ArithmeticUnary.CodeNodesAfter.Add(this.ArithmeticUnary);
             this.ArithmeticUnary.CodeNodesAfter.Add(this.CreateVar);
+            this.ArithmeticUnary.CodeNodesAfter.Add(this.ScreenOut);
 
             this.ArithmeticNode.CodeStart = "(";
             this.ArithmeticNode.isHaveThenAfter = true;
@@ -580,6 +618,7 @@ namespace FuncGeneretor
            this.ConditionNode.CodeNodesAfter.Add(this.PlacementNode);
            this.ConditionNode.CodeNodesAfter.Add(this.ArithmeticUnary);
            this.ConditionNode.CodeNodesAfter.Add(this.CreateVar);
+           this.ConditionNode.CodeNodesAfter.Add(this.ScreenOut);
 
             // Inside 1
             this.ConditionNode.CodeNodesInside1.Add(this.OperandsNode);
@@ -592,6 +631,7 @@ namespace FuncGeneretor
             this.ConditionNode.CodeNodesInside2.Add(this.PlacementNode);
             this.ConditionNode.CodeNodesInside2.Add(this.ArithmeticUnary);
             this.ConditionNode.CodeNodesInside2.Add(this.CreateVar);
+            this.ConditionNode.CodeNodesInside2.Add(this.ScreenOut);
 
             // After 
             ElseIfNode.CodeNodesAfter.Add(ElseIfNode);
@@ -608,6 +648,7 @@ namespace FuncGeneretor
             ElseIfNode.CodeNodesAfter.Add(this.PlacementNode);
             ElseIfNode.CodeNodesAfter.Add(this.ArithmeticUnary);
             ElseIfNode.CodeNodesAfter.Add(this.CreateVar);
+            ElseIfNode.CodeNodesAfter.Add(this.ScreenOut);
 
             // Inside 1
             ElseIfNode.CodeNodesInside1.Add(this.OperandsNode);
@@ -620,6 +661,7 @@ namespace FuncGeneretor
             ElseIfNode.CodeNodesInside2.Add(this.PlacementNode);
             ElseIfNode.CodeNodesInside2.Add(this.ArithmeticUnary);
             ElseIfNode.CodeNodesInside2.Add(this.CreateVar);
+            ElseIfNode.CodeNodesInside2.Add(this.ScreenOut);
 
             // After 
             ElseNode.CodeNodesAfter.Add(this.ReturnNode);
@@ -629,6 +671,7 @@ namespace FuncGeneretor
             ElseNode.CodeNodesAfter.Add(this.PlacementNode);
             ElseNode.CodeNodesAfter.Add(this.ArithmeticUnary);
             ElseNode.CodeNodesAfter.Add(this.CreateVar);
+            ElseNode.CodeNodesAfter.Add(this.ScreenOut);
 
             // Inside 2 
             ElseNode.CodeNodesInside1.Add(this.ReturnNode);
@@ -638,6 +681,7 @@ namespace FuncGeneretor
             ElseNode.CodeNodesInside1.Add(this.PlacementNode);
             ElseNode.CodeNodesInside1.Add(this.ArithmeticUnary);
             ElseNode.CodeNodesInside1.Add(this.CreateVar);
+            ElseNode.CodeNodesInside1.Add(this.ScreenOut);
         }
 
         public void BuildReturnNodes()
